@@ -25,8 +25,10 @@ def main():
         values_list.append([]) # intialize list to hold all empty lists
 
     for idx, row in training_data.iterrows():  # this for loop will iterate over the dataframe, here we will fill sum_list
+        tempvar = row
         sum_list, total_list = update_s_t_list(sum_list,total_list,row) # call helper method to update sum list
         values_list = update_values_list(values_list,row) # call helper method to update values list
+   # print(tempvar)
     s_idx = 0 # temp index used for sum -> mean loop 
     for sums in sum_list:
         mean_list.append((sums[0] / total_list[s_idx][0], sums[1] / total_list[s_idx][1])) # calculate and append mean for each x1 .. x30
@@ -69,6 +71,9 @@ def main():
             correct_count +=1
         test_idx += 1
     print("The Accuracy is:", correct_count/test_idx, ", or ",100 * (correct_count/test_idx),"%")
+  #  print(result_list)
+  #  print(z_prob)
+   # print(o_prob)
 
     # now we will test the sample input given in section 5 of the handout
     sample_vector =  [13.0, 15.0, 85.0, 500.0, 0.1, 0.15, 0.1, 
@@ -85,6 +90,8 @@ def classifier(attr_vector, mean_list, var_list, z_prob, o_prob):
     class_zero = 1 # probabilty of class zero
     class_one = 1 # probability of class one
     idx = 0
+  #  print("mean l: ",mean_list)
+   # print("var l: ",var_list)
     for attr in attr_vector: 
         # here we will plug in the attribute vecotr into a Gaussian distribution pdf
         # for each value in the attribute vector , we want to compute its conditional probability
@@ -93,12 +100,16 @@ def classifier(attr_vector, mean_list, var_list, z_prob, o_prob):
         value_1 = 1 / (math.sqrt(2 * math.pi * var_list[idx][0])) # first part of the formula, where you take 1 over the square rooot of 2 * pi * variance
         value_2 = math.exp(-((attr-mean_list[idx][0]) ** 2) / (2 * var_list[idx][0])) # second part of forumula, where you raise e to the negative power of x - mu sqaured over 2 * variance
         class_zero *= value_1 * value_2
-        value_2 = 1 / (math.sqrt(2 * math.pi * var_list[idx][1])) # repeat with same attribute but with class 1
-        value_3 = math.exp(-((attr-mean_list[idx][1]) ** 2) / (2 * var_list[idx][1])) 
-        class_one *= value_3 * value_3
+        value_3 = 1 / (math.sqrt(2 * math.pi * var_list[idx][1])) # repeat with same attribute but with class 1
+        value_4 = math.exp(-((attr-mean_list[idx][1]) ** 2) / (2 * var_list[idx][1])) 
+        class_one *= value_3 * value_4
         idx +=1
+   # print("c0:",class_zero)
+   # print("c1:",class_one)
     class_zero *= z_prob # must multiply by class probabilites
     class_one *= o_prob
+    #print(class_zero)
+    #print(class_one)
 
     if class_zero > class_one:
         return 0
